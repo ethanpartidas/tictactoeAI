@@ -43,7 +43,6 @@ int main(int argc, char **argv)
 	}
 
 	mnk::state *state = new mnk::state(width, height, in_a_row);
-	mcts::node *root = new mcts::node(state);
 	srand(time(NULL));
 	int human = 1 + rand() % 2;
 	state->print();
@@ -65,9 +64,10 @@ int main(int argc, char **argv)
 		else
 		{
 			std::cout << "AI is thinking..." << std::endl;
-			move = root->AI(iterations);
+			mcts::node root = mcts::node(state);
+			move = root.AI(iterations);
+			// std::cout << root.w / root.n << std::endl;
 		}
-		root = root->play_move(move);
 		state->play_move(move);
 
 		state->print();
@@ -87,7 +87,6 @@ int main(int argc, char **argv)
 		}
 	}
 	delete state;
-	delete root;
 
 	return 0;
 }

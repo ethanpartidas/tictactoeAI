@@ -3,7 +3,6 @@
 
 #include "common.hpp"
 #include <vector>
-#include <set>
 
 namespace mnk {
 	struct move

@@ -35,14 +35,12 @@ namespace mcts {
 		double w = 0;
 		int n = 0;
 		bool is_leaf = true;
-		std::vector<node*> children;
+		std::vector<node> children;
 		static game::state *state;
 
 		node(game::state *state_);
 		node(game::move last_move_);
-		~node();
 
-		node *play_move(game::move move);
 		void expand();
 		double UCT(int N);
 		node *max_child();
