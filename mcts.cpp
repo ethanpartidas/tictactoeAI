@@ -49,12 +49,12 @@ double mcts::node::UCT(int N)
 
 mcts::node *mcts::node::max_child()
 {
-	node *max_child = children[0];
-	double max_UCT = max_child->UCT(n);
+	node *max_child;
+	double max_UCT = 0;
 	for (node *child: children)
 	{
 		double child_UCT = child->UCT(n);
-		if (child_UCT > max_UCT)
+		if (child_UCT >= max_UCT)
 		{
 			max_child = child;
 			max_UCT = child_UCT;
