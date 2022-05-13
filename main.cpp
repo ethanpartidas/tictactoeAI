@@ -43,40 +43,37 @@ int main(int argc, char **argv)
 	}
 
 	mnk::state *state = new mnk::state(width, height, in_a_row);
-	mcts::node *root = new mcts::node();
+	mcts::node *root = new mcts::node(state);
 	srand(time(NULL));
 	int human = 1 + rand() % 2;
 	state->print();
 	while (true)
 	{
-		if (root->is_leaf)
-			root->expand(state);
+		mnk::move move;
 		if (state->current_player == human)
 		{
 			int x, y;
 			std::cout << "Enter move (x, y): ";
 			std::cin >> x >> y;
-			mnk::move move = mnk::move(x-1, y-1);
+			move = mnk::move(x-1, y-1);
 			if (!state->legal_move(move))
 			{
 				std::cout << "Illegal move, try again." << std::endl;
 				continue;
 			}
-			root = root->play_move(move);
-			state->play_move(move);
 		}
 		else
 		{
 			std::cout << "AI is thinking..." << std::endl;
-			root = mcts::AI(state, root, iterations);
-			state->play_move(root->last_move);
+			move = root->AI(iterations);
 		}
+		root = root->play_move(move);
+		state->play_move(move);
 
 		state->print();
 
 		if (state->won())
 		{
-			state->print();
 			if (state->last_player == common::player_1)
 				std::cout << "X has won!" << std::endl;
 			else

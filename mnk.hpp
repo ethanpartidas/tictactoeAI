@@ -6,7 +6,6 @@
 #include <set>
 
 namespace mnk {
-
 	struct move
 	{
 		int x;

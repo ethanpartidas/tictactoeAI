@@ -29,7 +29,6 @@ struct state
 */
 
 namespace mcts {
-	
 	struct node
 	{
 		game::move last_move = game::move();
@@ -37,20 +36,21 @@ namespace mcts {
 		int n = 0;
 		bool is_leaf = true;
 		std::vector<node*> children;
+		static game::state *state;
 
-		node();
+		node(game::state *state_);
 		node(game::move last_move_);
 		~node();
 
 		node *play_move(game::move move);
-		void expand(game::state *state);
+		void expand();
 		double UCT(int N);
 		node *max_child();
-	};
 
-	common::player rollout(game::state *state);
-	common::player iterate(game::state *state, node *node);
-	node *AI(game::state *state, node *node, int iterations);
+		static common::player rollout();
+		common::player iterate();
+		game::move AI(int iterations);
+	};
 }
 
 #endif

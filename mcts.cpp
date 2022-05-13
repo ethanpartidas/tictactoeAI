@@ -2,8 +2,11 @@
 #include <cmath>
 #include <cstdlib>
 
-mcts::node::node()
+game::state *mcts::node::state;
+
+mcts::node::node(game::state *state_)
 {
+	state = state_;
 }
 
 mcts::node::node(game::move last_move_)
@@ -19,6 +22,8 @@ mcts::node::~node()
 
 mcts::node *mcts::node::play_move(game::move move)
 {
+	if (is_leaf)
+		expand();
 	node *next_node;
 	for (node *child: children)
 		if (child->last_move == move)
@@ -28,7 +33,7 @@ mcts::node *mcts::node::play_move(game::move move)
 	return next_node;
 }
 
-void mcts::node::expand(game::state *state)
+void mcts::node::expand()
 {
 	for (game::move m: state->legal_moves())
 	{
@@ -51,7 +56,7 @@ mcts::node *mcts::node::max_child()
 	return max_child;
 }
 
-common::player mcts::rollout(game::state *state)
+common::player mcts::node::rollout()
 {
 	int moves_played = 0;
 	common::player winner = common::neither;
@@ -72,37 +77,37 @@ common::player mcts::rollout(game::state *state)
 	return winner;
 }
 
-common::player mcts::iterate(game::state *state, node *node)
+common::player mcts::node::iterate()
 {
 	common::player winner;
-	if (node->is_leaf)
+	if (is_leaf)
 	{
-		winner = rollout(state);
+		winner = rollout();
 		if (!state->won())
-			node->expand(state);
+			expand();
 	}
 	else
 	{
-		mcts::node *next_node = node->max_child();
+		mcts::node *next_node = max_child();
 		state->play_move(next_node->last_move);
-		winner = iterate(state, next_node);
+		winner = next_node->iterate();
 		state->undo_move();
 	}
 	if (winner == state->current_player)
-		node->w += 1;
+		w += 1;
 	if (winner == common::neither)
-		node->w += 0.5;
-	node->n++;
+		w += 0.5;
+	n++;
 	return winner;
 }
 
-mcts::node *mcts::AI(game::state *state, node *node, int iterations)
+game::move mcts::node::AI(int iterations)
 {
 	for (int i = 0; i < iterations; i++)
-		iterate(state, node);
-	mcts::node *max_child = node->children[0];
-	for (mcts::node *child: node->children)
+		iterate();
+	node *max_child = children[0];
+	for (node *child: children)
 		if (child->n > max_child->n)
 			max_child = child;
-	return max_child;
+	return max_child->last_move;
 }
