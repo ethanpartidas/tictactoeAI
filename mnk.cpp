@@ -128,67 +128,57 @@ bool mnk::state::won()
 	
 	move last_move = move_history.back();
 	
-	// vertical check
-	int count = 0;
-	for (int y = 0; y < height; y++)
-	{
-		if (board[last_move.x][y] == last_player)
-			count++;
-		else
-			count = 0;
-
-		if (count == in_a_row)
-			return true;
-	}
-
 	// horizontal check
-	count = 0;
-	for (int x = 0; x < width; x++)
-	{
-		if (board[x][last_move.y] == last_player)
-			count++;
-		else
-			count = 0;
+	int count = 0;
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		x++)
+		count++;
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		x--)
+		count++;
+	if (count > in_a_row)
+		return true;
 
-		if (count == in_a_row)
-			return true;
-	}
-
-	// diagonal check
-	int x_plus_y = last_move.x + last_move.y;
+	// vertical check
 	count = 0;
-	for (int x = 0; x < width; x++)
-	{
-		int y = x_plus_y - x;
-		if (!valid_move(move(x, y)))
-			continue;
-		
-		if (board[x][y] == last_player)
-			count++;
-		else
-			count = 0;
-		
-		if (count == in_a_row)
-			return true;
-	}
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		y++)
+		count++;
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		y--)
+		count++;
+	if (count > in_a_row)
+		return true;
 
 	// diagonal check
-	int x_minus_y = last_move.x - last_move.y;
 	count = 0;
-	for (int x = 0; x < width; x++)
-	{
-		int y = x - x_minus_y;
-		if (!valid_move(move(x, y)))
-			continue;
-		
-		if (board[x][y] == last_player)
-			count++;
-		else
-			count = 0;
-		
-		if (count == in_a_row)
-			return true;
-	}
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		x++, y++)
+		count++;
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		x--, y--)
+		count++;
+	if (count > in_a_row)
+		return true;
+
+	// diagonal check
+	count = 0;
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		x++, y--)
+		count++;
+	for (int x = last_move.x, y = last_move.y;
+		valid_move(move(x, y)) && board[x][y] == last_player;
+		x--, y++)
+		count++;
+	if (count > in_a_row)
+		return true;
 
 	return false;
 }
