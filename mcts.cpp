@@ -35,9 +35,9 @@ mcts::node *mcts::node::play_move(game::move move)
 
 void mcts::node::expand()
 {
-	for (game::move m: state->legal_moves())
+	for (game::move move: state->legal_moves())
 	{
-		children.push_back(new node(m));
+		children.push_back(new node(move));
 		is_leaf = false;
 	}
 }
@@ -50,9 +50,16 @@ double mcts::node::UCT(int N)
 mcts::node *mcts::node::max_child()
 {
 	node *max_child = children[0];
+	double max_UCT = max_child->UCT(n);
 	for (node *child: children)
-		if (child->UCT(n) > max_child->UCT(n))
+	{
+		double child_UCT = child->UCT(n);
+		if (child_UCT > max_UCT)
+		{
 			max_child = child;
+			max_UCT = child_UCT;
+		}
+	}
 	return max_child;
 }
 

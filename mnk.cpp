@@ -67,7 +67,7 @@ std::vector<mnk::move> mnk::state::legal_moves()
 	for (int x = 0; x < width; x++)
 		for (int y = 0; y < height; y++)
 			if (board[x][y] == common::neither)
-				legal_moves.push_back(move(x, y));
+				legal_moves.emplace_back(x, y);
 	return legal_moves;
 }
 
