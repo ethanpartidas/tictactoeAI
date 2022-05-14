@@ -1,3 +1,4 @@
+#include "common.hpp"
 #include "mnk.hpp"
 
 #include <iostream>
@@ -26,15 +27,16 @@ bool mnk::State::LegalMove(Move move) {
 }
 
 std::vector<mnk::Move> mnk::State::LegalMoves() {
-	std::vector<Move> LegalMoves;
+	std::vector<Move> legal_moves;
+	legal_moves.reserve(width * height);
 	for (int x = 0; x < width; ++x) {
 		for (int y = 0; y < height; ++y) {
 			if (board[x][y] == common::kNeither) {
-				LegalMoves.emplace_back(x, y);
+				legal_moves.emplace_back(x, y);
 			}
 		}
 	}
-	return LegalMoves;
+	return legal_moves;
 }
 
 void mnk::State::PlayMove(Move move) {

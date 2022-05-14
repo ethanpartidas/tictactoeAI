@@ -1,3 +1,4 @@
+#include "common.hpp"
 #include "mcts.hpp"
 
 #include <cmath>
@@ -9,7 +10,9 @@ mcts::Node::Node(game::State* state_) {
 }
 
 void mcts::Node::Expand() {
-	for (game::Move move : state->LegalMoves()) {
+	std::vector<game::Move> legal_moves = state->LegalMoves();
+	children.reserve(legal_moves.size());
+	for (game::Move move : legal_moves) {
 		children.emplace_back(move);
 		is_leaf = false;
 	}
