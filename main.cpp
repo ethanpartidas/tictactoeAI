@@ -8,7 +8,8 @@
 int main(int argc, char** argv)
 {
 	if (argc != 5) {
-		std::cout << "Enter width, height, in_a_row needed to win, and AI iterations as command line arguments.";
+		std::cout << "Enter width, height, in_a_row needed to win,"
+			<< " and AI iterations as command line arguments.";
 		return 0;
 	}
 
@@ -40,7 +41,7 @@ int main(int argc, char** argv)
 
 	srand(time(NULL));
 	int human = 1 + rand() % 2;
-	mnk::State state = mnk::State(width, height, in_a_row);
+	mnk::State state(width, height, in_a_row);
 	state.Print();
 	while (true) {
 		mnk::Move move;
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
 			}
 		} else {
 			std::cout << "AI is thinking...\n";
-			mcts::Node root = mcts::Node(&state);
+			mcts::Node root(&state);
 			move = root.Ai(iterations);
 			// std::cout << root.w / root.n << '\n';
 		}

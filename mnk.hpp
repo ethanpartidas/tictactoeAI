@@ -18,13 +18,12 @@ struct State {
 	int width;
 	int height;
 	int in_a_row;
-	common::Player **board;
+	std::vector<std::vector<common::Player>> board;
 	common::Player current_player = common::kPlayer1;
 	common::Player last_player = common::kPlayer2;
 	std::vector<Move> move_history;
 
 	State(int width_, int height_, int in_a_row_);
-	~State();
 
 	void FlipPlayer();
 	bool ValidMove(Move move); // true if x and y are within bounds of board

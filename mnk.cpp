@@ -6,17 +6,8 @@ mnk::State::State(int width_, int height_, int in_a_row_) {
 	width = width_;
 	height = height_;
 	in_a_row = in_a_row_;
-	board = new common::Player*[width];
-	for (int x = 0; x < width; ++x) {
-		board[x] = new common::Player[height]{common::kNeither};
-	}
-}
-	
-mnk::State::~State() {
-	for (int x = 0; x < width; ++x) {
-		delete[] board[x];
-	}
-	delete[] board;
+	board = std::vector<std::vector<common::Player>>(width,
+		std::vector<common::Player>(height, common::kNeither));
 }
 
 void mnk::State::FlipPlayer() {
@@ -26,13 +17,12 @@ void mnk::State::FlipPlayer() {
 }
 
 bool mnk::State::ValidMove(Move move) {
-	return move.x >= 0 && move.x < width
-		&& move.y >=0 && move.y < height;
+	return move.x >= 0 && move.x < width &&
+		move.y >=0 && move.y < height;
 }
 
 bool mnk::State::LegalMove(Move move) {
-	return ValidMove(move)
-		&& board[move.x][move.y] == common::kNeither;
+	return ValidMove(move) && board[move.x][move.y] == common::kNeither;
 }
 
 std::vector<mnk::Move> mnk::State::LegalMoves() {
@@ -55,7 +45,7 @@ void mnk::State::PlayMove(Move move) {
 
 void mnk::State::PlayRandomMove() {
 	while (true) {
-		Move move = Move(rand() % width, rand() % height);
+		Move move(rand() % width, rand() % height);
 		if (LegalMove(move)) {
 			PlayMove(move);
 			break;
@@ -95,42 +85,22 @@ bool mnk::State::Won() {
 	if (move_history.size() == 0) {
 		return false;
 	}
-	
 	Move last_move = move_history.back();
 	
-	// horizontal check
-	int count = 0;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++x) ++count;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --x) ++count;
-	if (count > in_a_row) {
-		return true;
-	}
+	auto CountRay = [&](int delta_x, int delta_y) {
+		int count = 0;
+		for (int x = last_move.x, y = last_move.y;
+				ValidMove(Move(x, y)) && board[x][y] == last_player;
+				x += delta_x, y += delta_y) {
+			++count;
+		}
+		return count;
+	};
 
-	// vertical check
-	count = 0;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++y) ++count;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --y) ++count;
-	if (count > in_a_row) {
-		return true;
-	}
-
-	// diagonal check
-	count = 0;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++x, ++y) ++count;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --x, --y) ++count;
-	if (count > in_a_row) {
-		return true;
-	}
-
-	// diagonal check
-	count = 0;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++x, --y) ++count;
-	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --x, ++y) ++count;
-	if (count > in_a_row) {
-		return true;
-	}
-
-	return false;
+	return CountRay(1, 0) + CountRay(-1, 0) > in_a_row ||
+		CountRay(0, 1) + CountRay(0, -1) > in_a_row ||
+		CountRay(1, 1) + CountRay(-1, -1) > in_a_row ||
+		CountRay(1, -1) + CountRay(-1, 1) > in_a_row;
 }
 
 bool mnk::State::Drawn() {
