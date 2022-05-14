@@ -2,165 +2,137 @@
 
 #include <iostream>
 
-mnk::state::state(int width_, int height_, int in_a_row_)
-{
+mnk::State::State(int width_, int height_, int in_a_row_) {
 	width = width_;
 	height = height_;
 	in_a_row = in_a_row_;
-	board = new common::player*[width];
-	for (int x = 0; x < width; ++x)
-		board[x] = new common::player[height]{common::neither};
+	board = new common::Player*[width];
+	for (int x = 0; x < width; ++x) {
+		board[x] = new common::Player[height]{common::kNeither};
+	}
 }
 	
-mnk::state::~state()
-{
-	for (int x = 0; x < width; ++x)
+mnk::State::~State() {
+	for (int x = 0; x < width; ++x) {
 		delete[] board[x];
+	}
 	delete[] board;
 }
 
-void mnk::state::flip_player()
-{
-	common::player temp = last_player;
+void mnk::State::FlipPlayer() {
+	common::Player temp = last_player;
 	last_player = current_player;
 	current_player = temp;
 }
 
-bool mnk::state::valid_move(move move)
-{
+bool mnk::State::ValidMove(Move move) {
 	return move.x >= 0 && move.x < width
 		&& move.y >=0 && move.y < height;
 }
 
-bool mnk::state::legal_move(move move)
-{
-	return valid_move(move)
-		&& board[move.x][move.y] == common::neither;
+bool mnk::State::LegalMove(Move move) {
+	return ValidMove(move)
+		&& board[move.x][move.y] == common::kNeither;
 }
 
-std::vector<mnk::move> mnk::state::legal_moves()
-{
-	std::vector<move> legal_moves;
-	for (int x = 0; x < width; ++x)
-		for (int y = 0; y < height; ++y)
-			if (board[x][y] == common::neither)
-				legal_moves.emplace_back(x, y);
-	return legal_moves;
+std::vector<mnk::Move> mnk::State::LegalMoves() {
+	std::vector<Move> LegalMoves;
+	for (int x = 0; x < width; ++x) {
+		for (int y = 0; y < height; ++y) {
+			if (board[x][y] == common::kNeither) {
+				LegalMoves.emplace_back(x, y);
+			}
+		}
+	}
+	return LegalMoves;
 }
 
-void mnk::state::play_move(move move)
-{
+void mnk::State::PlayMove(Move move) {
 	board[move.x][move.y] = current_player;
 	move_history.push_back(move);
-	flip_player();
+	FlipPlayer();
 }
 
-void mnk::state::play_random_move()
-{
-	while (true)
-	{
-		mnk::move move = mnk::move(rand() % width, rand() % height);
-		if (legal_move(move))
-		{
-			play_move(move);
+void mnk::State::PlayRandomMove() {
+	while (true) {
+		Move move = Move(rand() % width, rand() % height);
+		if (LegalMove(move)) {
+			PlayMove(move);
 			break;
 		}
 	}
 }
 
-void mnk::state::undo_move()
-{
-	move last_move = move_history.back();
-	board[last_move.x][last_move.y] = common::neither;
+void mnk::State::UndoMove() {
+	Move last_move = move_history.back();
+	board[last_move.x][last_move.y] = common::kNeither;
 	move_history.pop_back();
-	flip_player();
+	FlipPlayer();
 }
 
-void mnk::state::print()
-{
+void mnk::State::Print() {
 	std::cout << '\n';
-	for (int y = height - 1; y >= 0; --y)
-	{
-		for (int x = 0; x < width; ++x)
-		{
-			if (board[x][y] == common::player_1)
+	for (int y = height - 1; y >= 0; --y) {
+		for (int x = 0; x < width; ++x) {
+			if (board[x][y] == common::kPlayer1) {
 				std::cout << 'X';
-			else if (board[x][y] == common::player_2)
+			} else if (board[x][y] == common::kPlayer2) {
 				std::cout << 'O';
-			else
+			} else {
 				std::cout << '_';
+			}
 			
-			if (x < width - 1)
+			if (x < width - 1) {
 				std::cout << '|';
-			else
+			} else {
 				std::cout << '\n';
+			}
 		}
 	}
 }
 
-bool mnk::state::won()
-{
-	if (move_history.size() == 0)
+bool mnk::State::Won() {
+	if (move_history.size() == 0) {
 		return false;
+	}
 	
-	move last_move = move_history.back();
+	Move last_move = move_history.back();
 	
 	// horizontal check
 	int count = 0;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		++x)
-		++count;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		--x)
-		++count;
-	if (count > in_a_row)
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++x) ++count;
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --x) ++count;
+	if (count > in_a_row) {
 		return true;
+	}
 
 	// vertical check
 	count = 0;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		++y)
-		++count;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		--y)
-		++count;
-	if (count > in_a_row)
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++y) ++count;
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --y) ++count;
+	if (count > in_a_row) {
 		return true;
+	}
 
 	// diagonal check
 	count = 0;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		++x, ++y)
-		++count;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		--x, --y)
-		++count;
-	if (count > in_a_row)
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++x, ++y) ++count;
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --x, --y) ++count;
+	if (count > in_a_row) {
 		return true;
+	}
 
 	// diagonal check
 	count = 0;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		++x, --y)
-		++count;
-	for (int x = last_move.x, y = last_move.y;
-		valid_move(move(x, y)) && board[x][y] == last_player;
-		--x, ++y)
-		++count;
-	if (count > in_a_row)
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; ++x, --y) ++count;
+	for (int x = last_move.x, y = last_move.y; ValidMove(Move(x, y)) && board[x][y] == last_player; --x, ++y) ++count;
+	if (count > in_a_row) {
 		return true;
+	}
 
 	return false;
 }
 
-bool mnk::state::drawn()
-{
+bool mnk::State::Drawn() {
 	return move_history.size() == width * height;
 }

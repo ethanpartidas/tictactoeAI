@@ -7,39 +7,37 @@
 
 namespace mnk {
 
-struct move
-{
+struct Move {
 	int x = -1;
 	int y = -1;
-	constexpr move() {};
-	move(int x_, int y_) : x(x_), y(y_) {};
+	constexpr Move() {};
+	Move(int x_, int y_) : x(x_), y(y_) {};
 };
 
-struct state
-{
+struct State {
 	int width;
 	int height;
 	int in_a_row;
-	common::player **board;
-	common::player current_player = common::player_1;
-	common::player last_player = common::player_2;
-	std::vector<move> move_history;
+	common::Player **board;
+	common::Player current_player = common::kPlayer1;
+	common::Player last_player = common::kPlayer2;
+	std::vector<Move> move_history;
 
-	state(int width_, int height_, int in_a_row_);
-	~state();
+	State(int width_, int height_, int in_a_row_);
+	~State();
 
-	void flip_player();
-	bool valid_move(move move); // true if x and y are within bounds of board
-	bool legal_move(move move); // true if valid and cell is empty
-	std::vector<move> legal_moves();
-	void play_move(move move);
-	void play_random_move();
-	void undo_move();
-	void print();
-	bool won();
-	bool drawn();
+	void FlipPlayer();
+	bool ValidMove(Move move); // true if x and y are within bounds of board
+	bool LegalMove(Move move); // true if valid and cell is empty
+	std::vector<Move> LegalMoves();
+	void PlayMove(Move move);
+	void PlayRandomMove();
+	void UndoMove();
+	void Print();
+	bool Won();
+	bool Drawn();
 };
 
-} // namespace mnk
+}  // namespace mnk
 
-#endif // MNK_HPP
+#endif  // MNK_HPP
