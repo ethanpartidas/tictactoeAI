@@ -1,29 +1,6 @@
 #include "mnk.hpp"
+
 #include <iostream>
-
-mnk::move::move()
-{
-	x = -1;
-	y = -1;
-}
-
-mnk::move::move(int x_, int y_)
-{
-	x = x_;
-	y = y_;
-}
-
-bool mnk::move::operator==(const move& other)
-{
-	return this->x == other.x
-		&& this->y == other.y;
-}
-
-bool mnk::move::operator<(const move& other) const
-{
-	return this->x < other.x
-		|| this->y < other.y;
-}
 
 mnk::state::state(int width_, int height_, int in_a_row_)
 {
@@ -31,13 +8,13 @@ mnk::state::state(int width_, int height_, int in_a_row_)
 	height = height_;
 	in_a_row = in_a_row_;
 	board = new common::player*[width];
-	for (int x = 0; x < width; x++)
+	for (int x = 0; x < width; ++x)
 		board[x] = new common::player[height]{common::neither};
 }
 	
 mnk::state::~state()
 {
-	for (int x = 0; x < width; x++)
+	for (int x = 0; x < width; ++x)
 		delete[] board[x];
 	delete[] board;
 }
@@ -64,8 +41,8 @@ bool mnk::state::legal_move(move move)
 std::vector<mnk::move> mnk::state::legal_moves()
 {
 	std::vector<move> legal_moves;
-	for (int x = 0; x < width; x++)
-		for (int y = 0; y < height; y++)
+	for (int x = 0; x < width; ++x)
+		for (int y = 0; y < height; ++y)
 			if (board[x][y] == common::neither)
 				legal_moves.emplace_back(x, y);
 	return legal_moves;
@@ -101,10 +78,10 @@ void mnk::state::undo_move()
 
 void mnk::state::print()
 {
-	std::cout << std::endl;
-	for (int y = height - 1; y >= 0; y--)
+	std::cout << '\n';
+	for (int y = height - 1; y >= 0; --y)
 	{
-		for (int x = 0; x < width; x++)
+		for (int x = 0; x < width; ++x)
 		{
 			if (board[x][y] == common::player_1)
 				std::cout << 'X';
@@ -116,7 +93,7 @@ void mnk::state::print()
 			if (x < width - 1)
 				std::cout << '|';
 			else
-				std::cout << std::endl;
+				std::cout << '\n';
 		}
 	}
 }
@@ -132,12 +109,12 @@ bool mnk::state::won()
 	int count = 0;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		x++)
-		count++;
+		++x)
+		++count;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		x--)
-		count++;
+		--x)
+		++count;
 	if (count > in_a_row)
 		return true;
 
@@ -145,12 +122,12 @@ bool mnk::state::won()
 	count = 0;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		y++)
-		count++;
+		++y)
+		++count;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		y--)
-		count++;
+		--y)
+		++count;
 	if (count > in_a_row)
 		return true;
 
@@ -158,12 +135,12 @@ bool mnk::state::won()
 	count = 0;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		x++, y++)
-		count++;
+		++x, ++y)
+		++count;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		x--, y--)
-		count++;
+		--x, --y)
+		++count;
 	if (count > in_a_row)
 		return true;
 
@@ -171,12 +148,12 @@ bool mnk::state::won()
 	count = 0;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		x++, y--)
-		count++;
+		++x, --y)
+		++count;
 	for (int x = last_move.x, y = last_move.y;
 		valid_move(move(x, y)) && board[x][y] == last_player;
-		x--, y++)
-		count++;
+		--x, ++y)
+		++count;
 	if (count > in_a_row)
 		return true;
 

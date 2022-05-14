@@ -1,9 +1,10 @@
 #ifndef MCTS_HPP
 #define MCTS_HPP
 
-#include "mnk.hpp"
-#include "common.hpp"
 #include <vector>
+
+#include "common.hpp"
+#include "mnk.hpp"
 
 namespace game = mnk;
 /* game must implement:
@@ -29,26 +30,28 @@ struct state
 */
 
 namespace mcts {
-	struct node
-	{
-		game::move last_move = game::move();
-		double w = 0;
-		int n = 0;
-		bool is_leaf = true;
-		std::vector<node> children;
-		static game::state *state;
 
-		node(game::state *state_);
-		node(game::move last_move_);
+struct node
+{
+	game::move last_move = game::move();
+	double w = 0;
+	int n = 0;
+	bool is_leaf = true;
+	std::vector<node> children;
+	static game::state *state;
 
-		void expand();
-		double UCT(int N);
-		node *max_child();
+	node(game::state *state_);
+	node(game::move last_move_);
 
-		static common::player rollout();
-		common::player iterate();
-		game::move AI(int iterations);
-	};
-}
+	void expand();
+	double UCT(int N);
+	node& max_child();
 
-#endif
+	static common::player rollout();
+	common::player iterate();
+	game::move AI(int iterations);
+};
+
+} // namespace mcts
+
+#endif // MCTS_HPP

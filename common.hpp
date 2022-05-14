@@ -2,7 +2,9 @@
 #define COMMON_HPP
 
 namespace common {
-	enum player { neither, player_1, player_2 };
-}
+	
+enum player { neither, player_1, player_2 };
 
-#endif
+} // namespace common
+
+#endif // COMMON_HPP

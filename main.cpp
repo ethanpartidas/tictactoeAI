@@ -1,7 +1,9 @@
-#include "mnk.hpp"
-#include "mcts.hpp"
 #include <iostream>
 #include <ctime>
+
+#include "common.hpp"
+#include "mnk.hpp"
+#include "mcts.hpp"
 
 int main(int argc, char **argv)
 {
@@ -42,51 +44,50 @@ int main(int argc, char **argv)
 		return 0;
 	}
 
-	mnk::state *state = new mnk::state(width, height, in_a_row);
 	srand(time(NULL));
 	int human = 1 + rand() % 2;
-	state->print();
+	mnk::state state = mnk::state(width, height, in_a_row);
+	state.print();
 	while (true)
 	{
 		mnk::move move;
-		if (state->current_player == human)
+		if (state.current_player == human)
 		{
-			int x, y;
 			std::cout << "Enter move (x, y): ";
+			int x, y;
 			std::cin >> x >> y;
 			move = mnk::move(x-1, y-1);
-			if (!state->legal_move(move))
+			if (!state.legal_move(move))
 			{
-				std::cout << "Illegal move, try again." << std::endl;
+				std::cout << "Illegal move, try again.\n";
 				continue;
 			}
 		}
 		else
 		{
-			std::cout << "AI is thinking..." << std::endl;
-			mcts::node root = mcts::node(state);
+			std::cout << "AI is thinking...\n";
+			mcts::node root = mcts::node(&state);
 			move = root.AI(iterations);
-			// std::cout << root.w / root.n << std::endl;
+			// std::cout << root.w / root.n << '\n';
 		}
-		state->play_move(move);
+		state.play_move(move);
 
-		state->print();
+		state.print();
 
-		if (state->won())
+		if (state.won())
 		{
-			if (state->last_player == common::player_1)
-				std::cout << "X has won!" << std::endl;
+			if (state.last_player == common::player_1)
+				std::cout << "X has won!\n";
 			else
-				std::cout << "O has won!" << std::endl;
+				std::cout << "O has won!\n";
 			break;
 		}
-		if (state->drawn())
+		if (state.drawn())
 		{
-			std::cout << "It's a draw." << std::endl;
+			std::cout << "It's a draw.\n";
 			break;
 		}
 	}
-	delete state;
 
 	return 0;
 }

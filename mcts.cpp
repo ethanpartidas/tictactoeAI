@@ -1,6 +1,6 @@
 #include "mcts.hpp"
+
 #include <cmath>
-#include <cstdlib>
 
 game::state *mcts::node::state;
 
@@ -28,11 +28,11 @@ double mcts::node::UCT(int N)
 	return (n - w) / (n + 1) + sqrt(2 * log(N + 1) / (n + 1));
 }
 
-mcts::node *mcts::node::max_child()
+mcts::node& mcts::node::max_child()
 {
 	int max_i;
 	double max_UCT = 0;
-	for (int i = 0; i < children.size(); i++)
+	for (int i = 0; i < children.size(); ++i)
 	{
 		double child_UCT = children[i].UCT(n);
 		if (child_UCT >= max_UCT)
@@ -41,7 +41,7 @@ mcts::node *mcts::node::max_child()
 			max_UCT = child_UCT;
 		}
 	}
-	return &children[max_i];
+	return children[max_i];
 }
 
 common::player mcts::node::rollout()
@@ -58,9 +58,9 @@ common::player mcts::node::rollout()
 		if (state->drawn())
 			break;
 		state->play_random_move();
-		moves_played++;
+		++moves_played;
 	}
-	for (int i = 0; i < moves_played; i++)
+	for (int i = 0; i < moves_played; ++i)
 		state->undo_move();
 	return winner;
 }
@@ -76,25 +76,25 @@ common::player mcts::node::iterate()
 	}
 	else
 	{
-		node *next_node = max_child();
-		state->play_move(next_node->last_move);
-		winner = next_node->iterate();
+		node& next_node = max_child();
+		state->play_move(next_node.last_move);
+		winner = next_node.iterate();
 		state->undo_move();
 	}
 	if (winner == state->current_player)
 		w += 1;
 	if (winner == common::neither)
 		w += 0.5;
-	n++;
+	++n;
 	return winner;
 }
 
 game::move mcts::node::AI(int iterations)
 {
-	for (int i = 0; i < iterations; i++)
+	for (int i = 0; i < iterations; ++i)
 		iterate();
 	int max_i = 0;
-	for (int i = 1; i < children.size(); i++)
+	for (int i = 1; i < children.size(); ++i)
 		if (children[i].n > children[max_i].n)
 			max_i = i;
 	return children[max_i].last_move;
