@@ -11,6 +11,27 @@ mnk::State::State(int width_, int height_, int in_a_row_) {
 		std::vector<common::Player>(height, common::kNeither));
 }
 
+void mnk::State::Print() {
+	std::cout << '\n';
+	for (int y = height - 1; y >= 0; --y) {
+		for (int x = 0; x < width; ++x) {
+			if (board[x][y] == common::kPlayer1) {
+				std::cout << 'X';
+			} else if (board[x][y] == common::kPlayer2) {
+				std::cout << 'O';
+			} else {
+				std::cout << '_';
+			}
+						
+			if (x < width - 1) {
+				std::cout << '|';
+			} else {
+				std::cout << '\n';
+			}
+		}
+	}
+}
+
 void mnk::State::FlipPlayer() {
 	common::Player temp = last_player;
 	last_player = current_player;
@@ -60,30 +81,15 @@ void mnk::State::UndoMove() {
 	board[last_move.x][last_move.y] = common::kNeither;
 	move_history.pop_back();
 	FlipPlayer();
+	winner = common::kNeither;
 }
 
-void mnk::State::Print() {
-	std::cout << '\n';
-	for (int y = height - 1; y >= 0; --y) {
-		for (int x = 0; x < width; ++x) {
-			if (board[x][y] == common::kPlayer1) {
-				std::cout << 'X';
-			} else if (board[x][y] == common::kPlayer2) {
-				std::cout << 'O';
-			} else {
-				std::cout << '_';
-			}
-			
-			if (x < width - 1) {
-				std::cout << '|';
-			} else {
-				std::cout << '\n';
-			}
-		}
+bool mnk::State::GameOver() {
+	if (winner != common::kNeither ||
+			move_history.size() == width * height) {
+		return true;
 	}
-}
 
-bool mnk::State::Won() {
 	if (move_history.size() == 0) {
 		return false;
 	}
@@ -99,12 +105,12 @@ bool mnk::State::Won() {
 		return count;
 	};
 
-	return CountRay(1, 0) + CountRay(-1, 0) > in_a_row ||
+	if (CountRay(1, 0) + CountRay(-1, 0) > in_a_row ||
 		CountRay(0, 1) + CountRay(0, -1) > in_a_row ||
 		CountRay(1, 1) + CountRay(-1, -1) > in_a_row ||
-		CountRay(1, -1) + CountRay(-1, 1) > in_a_row;
-}
-
-bool mnk::State::Drawn() {
-	return move_history.size() == width * height;
+		CountRay(1, -1) + CountRay(-1, 1) > in_a_row) {
+		winner = last_player;
+		return true;
+	}
+	return false;
 }

@@ -64,17 +64,18 @@ int main(int argc, char** argv)
 
 		state.Print();
 
-		if (state.Won()) {
-			if (state.last_player == common::kPlayer1) {
-				std::cout << "X has won!\n";
-			} else {
-				std::cout << "O has won!\n";
+		if (state.GameOver()) {
+			switch(state.winner) {
+				case common::kNeither:
+					std::cout << "It's a draw.\n";
+					break;
+				case common::kPlayer1:
+					std::cout << "X has won!\n";
+					break;
+				case common::kPlayer2:
+					std::cout << "O has won!\n";
+					break;
 			}
-			break;
-		}
-		if (state.Drawn()) {
-			std::cout << "It's a draw.\n";
-			break;
 		}
 	}
 

@@ -37,17 +37,11 @@ mcts::Node& mcts::Node::MaxChild() {
 
 common::Player mcts::Node::Rollout() {
 	int moves_played = 0;
-	common::Player winner = common::kNeither;
-	while (true) {
-		if (state->Won()) {
-			winner = state->last_player;
-			break;
-		}
-		if (state->Drawn())
-			break;
+	while (!state->GameOver()) {
 		state->PlayRandomMove();
 		++moves_played;
 	}
+	common::Player winner = state->winner;
 	for (int i = 0; i < moves_played; ++i) {
 		state->UndoMove();
 	}
@@ -58,7 +52,7 @@ common::Player mcts::Node::Iterate() {
 	common::Player winner;
 	if (is_leaf) {
 		winner = Rollout();
-		if (!state->Won()) {
+		if (!state->GameOver()) {
 			Expand();
 		}
 	} else {

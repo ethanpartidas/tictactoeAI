@@ -16,15 +16,15 @@ struct Move
 
 struct State
 {
-	common::Player last_player
-	common::Player current_player
+	common::Player winner;
+	common::Player current_player;
+	common::Player last_player;
 
 	std::vector<Move> LegalMoves();
 	void PlayMove(Move move);
 	void PlayRandomMove();
 	void UndoMove();
-	bool Won();  // true if kPlayer1 or kPlayer2 has won
-	bool Drawn();  // true if game is drawn, can assume won() is false
+	bool GameOver();
 }
 
 */
